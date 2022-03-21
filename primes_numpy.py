@@ -6,8 +6,6 @@ The first w/ 0 primes occurs at 16718 (1671800  .. 1671899).
 """
 
 import numpy as np
-from tqdm import tqdm
-from timeit import default_timer as timer
 
 EXPECTED = np.array([25, 21, 16, 16, 17, 14, 16, 14, 15, 14, 16, 12, 15, 11, 17, 12, 15, 12, 12, 13, 14, 10])
 
@@ -44,17 +42,6 @@ def sparse_centuries_primes(p, max_primes=1):
     return list_of_str
 
 
-def primes_per_century_loop(p):
-    """Does this in a silly way with loop."""
-    list_of_counts = []
-    for century in tqdm(range(MAX_NUM // 100)):
-        lower = century * 100
-        upper = lower + 99
-        count = np.sum(np.greater_equal(p, lower) * np.less_equal(p, upper))
-        list_of_counts.append(count)
-    return list_of_counts
-
-
 def primes_per_century_vec(p):
     idx_new_century = np.hstack((-1,
                                 np.nonzero(np.diff(p // 100))[0],
@@ -69,26 +56,12 @@ def primes_per_century_vec(p):
 if __name__ == '__main__':
     # print('\n'.join(sparse_centuries_primes(P, 100)))
     # print()
-    s = timer()
     P = primesfrom2to(MAX_NUM)
-    e = timer()
-    print(e - s)
 
     print("Expected")
     print(EXPECTED)
     print()
 
-    print("first way")
-    s = timer()
-    ppc = primes_per_century_loop(P)
-    e = timer()
-    print(e-s)
-    print(np.array(ppc))
-    print()
-
-    print("third way (diff)")
-    s = timer()
+    print("fast way (np.diff)")
     simple_diff = primes_per_century_vec(P)
-    e = timer()
-    print(e-s)
     print(simple_diff)
