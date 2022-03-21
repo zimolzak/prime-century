@@ -64,7 +64,9 @@ if __name__ == '__main__':
     # print()
 
     ppc = primes_per_century(P)
-    simple_diff = np.diff(np.nonzero(np.diff(P // 100)))
+    idx_new_century = np.nonzero(np.diff(P // 100))
+    idx_new_century = np.hstack((-1, idx_new_century[0]))
+    simple_diff = np.diff(idx_new_century)
     #                                         1st digit
     #                                 1 where switch
     #                     indices where switch
@@ -72,7 +74,7 @@ if __name__ == '__main__':
 
     exp_reduce = np.add.reduceat(EXPECTED, [0,3, 4,7])[::2]
     ppc_reduce = np.add.reduceat(ppc, [0,3, 4,7])[::2]
-    sd_reduce = np.add.reduceat(simple_diff[0], [0,3, 4,7])
+    sd_reduce = np.add.reduceat(simple_diff, [0,3, 4,7])
 
     print("Expected")
     print(EXPECTED)
