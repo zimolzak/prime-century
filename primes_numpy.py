@@ -8,12 +8,10 @@ The first w/ 0 primes occurs at 16718 (1671800  .. 1671899).
 import numpy as np
 from tqdm import tqdm
 
-EXPECTED = [25, 21, 16, 16, 17, 14, 16, 14, 15, 14, 16, 12]
+EXPECTED = np.array([25, 21, 16, 16, 17, 14, 16, 14, 15, 14, 16, 12, 15, 11, 17, 12, 15, 12, 12, 13, 14, 10])
 
 #  MAX_NUM = 3 * 10 ** 6
-n_rows = 4
-n_sieve_elements = 100 * n_rows
-MAX_NUM = 3 * n_sieve_elements
+MAX_NUM = 10 ** 6  # 100 * len(EXPECTED)
 
 
 def sievefrom2to(n):
@@ -50,6 +48,7 @@ def sparse_centuries_primes(p, max_primes=1):
 
 
 def primes_per_century(p):
+    """Does this in a silly way with loop."""
     list_of_counts = []
     for century in tqdm(range(MAX_NUM // 100)):
         lower = century * 100
@@ -64,28 +63,21 @@ if __name__ == '__main__':
     # print()
 
     ppc = primes_per_century(P)
-    idx_new_century = np.nonzero(np.diff(P // 100))
-    idx_new_century = np.hstack((-1, idx_new_century[0]))
+    idx_new_century = np.hstack((-1,
+                                np.nonzero(np.diff(P // 100))[0],
+                                #                  hundreds place
+                                #          =1 where it switches to new century
+                                # indices where it switches
+                                 len(P) - 1))
     simple_diff = np.diff(idx_new_century)
-    #                                         1st digit
-    #                                 1 where switch
-    #                     indices where switch
-    #             diff in indices
-
-    exp_reduce = np.add.reduceat(EXPECTED, [0,3, 4,7])[::2]
-    ppc_reduce = np.add.reduceat(ppc, [0,3, 4,7])[::2]
-    sd_reduce = np.add.reduceat(simple_diff, [0,3, 4,7])
 
     print("Expected")
     print(EXPECTED)
-    print(exp_reduce)
     print()
 
     print("first way")
-    print(ppc)
-    print(ppc_reduce)
+    print(np.array(ppc))
     print()
 
     print("third way (diff)")
     print(simple_diff)
-    print(sd_reduce)
