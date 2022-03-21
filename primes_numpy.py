@@ -3,6 +3,8 @@ https://oeis.org/A038822
 Number of primes between 100n and 100n+99.
 Look at the scatterplot graph. < 5 primes in a 100 digit range is pretty special.
 The first w/ 0 primes occurs at 16718 (1671800  .. 1671899).
+
+FIXME - some kind of bug where it skips primefree centuries rather than counting them.
 """
 
 import numpy as np
@@ -33,7 +35,7 @@ def primesfrom2to(n):
 def sparse_centuries_primes(p, max_primes=1):
     """Basically a printing function, very little math."""
     list_of_str = []
-    count_list = primes_per_century_loop(p)
+    count_list = primes_per_century_vec(p)
     for century, count in enumerate(count_list):
         lower = century * 100
         upper = lower + 99
@@ -58,10 +60,7 @@ if __name__ == '__main__':
     # print()
     P = primesfrom2to(MAX_NUM)
 
-    print("Expected")
-    print(EXPECTED)
-    print()
+    #simple_diff = primes_per_century_vec(P)
+    #print(simple_diff)
 
-    print("fast way (np.diff)")
-    simple_diff = primes_per_century_vec(P)
-    print(simple_diff)
+    print('\n'.join(sparse_centuries_primes(P)))
