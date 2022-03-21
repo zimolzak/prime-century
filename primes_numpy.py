@@ -1,7 +1,9 @@
 import numpy as np
 from tqdm import tqdm
 
-MAX_NUM = 3 * 10 ** 6
+#  MAX_NUM = 3 * 10 ** 6
+n_sieve_elements = 200
+MAX_NUM = 3 * n_sieve_elements
 
 
 def sievefrom2to(n):
@@ -25,19 +27,23 @@ def primesfrom2to(n):
 P = primesfrom2to(MAX_NUM)
 
 
-def sparse_centuries_primes(p):
+def sparse_centuries_primes(p, max_primes=1):
     list_of_str = []
     for century in tqdm(range(MAX_NUM // 100)):
         lower = century * 100
         upper = lower + 99
         indices = np.greater(p, lower) * np.less(p, upper)
         count = len(p[indices])
-        if count < 2:
+        if count <= max_primes:
             list_of_str.append("%i %i %i %i" % (century, lower, upper, count))
     return list_of_str
 
 
+s6 = sievefrom2to(MAX_NUM).reshape((-1, 100))  # 2 row * 100 col
+indices = np.argwhere(s6)  # ary of [i,j] nonzero indices
+unrolled_indices = indices
+
 if __name__ == '__main__':
-    # print('\n'.join(sparse_centuries_primes(P)))
-    for i, x in enumerate(sievefrom2to(30)):
-        print(i, i + 1, i + 2, i + 3, i + 4, x)
+    print('\n'.join(sparse_centuries_primes(P, 100)))
+    print(np.sum(np.equal(indices[:, 0], 0)))
+    print(np.sum(np.equal(indices[:, 0], 1)))
