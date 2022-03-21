@@ -54,7 +54,7 @@ def primes_per_century(p):
     for century in tqdm(range(MAX_NUM // 100)):
         lower = century * 100
         upper = lower + 99
-        count = np.sum(np.greater(p, lower) * np.less(p, upper))
+        count = np.sum(np.greater_equal(p, lower) * np.less_equal(p, upper))
         list_of_counts.append(count)
     return list_of_counts
 
