@@ -1,8 +1,16 @@
+"""Whole point is OEIS A038822.
+https://oeis.org/A038822
+Number of primes between 100n and 100n+99.
+Look at the scatterplot graph. < 5 primes in a 100 digit range is pretty special.
+The first w/ 0 primes occurs at 16718 (1671800  .. 1671899).
+"""
+
 import numpy as np
 from tqdm import tqdm
 
 #  MAX_NUM = 3 * 10 ** 6
-n_sieve_elements = 200
+n_rows = 4
+n_sieve_elements = 100 * n_rows
 MAX_NUM = 3 * n_sieve_elements
 
 
@@ -43,7 +51,14 @@ s6 = sievefrom2to(MAX_NUM).reshape((-1, 100))  # 2 row * 100 col
 indices = np.argwhere(s6)  # ary of [i,j] nonzero indices
 unrolled_indices = indices
 
+simple_diff = np.diff(np.nonzero(np.diff(P // 100)))
+#                                         1st digit
+#                                 1 where switch
+#                     indices where switch
+#             diff in indices
+
 if __name__ == '__main__':
     print('\n'.join(sparse_centuries_primes(P, 100)))
-    print(np.sum(np.equal(indices[:, 0], 0)))
-    print(np.sum(np.equal(indices[:, 0], 1)))
+    print(np.sum(np.equal(indices[:, 0], 0)), "from 0 .. 300?")
+    print(np.sum(np.equal(indices[:, 0], 1)), "from 301 .. 600?")
+    print(simple_diff)
