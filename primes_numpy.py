@@ -59,21 +59,17 @@ def primes_per_century(p):
     return list_of_counts
 
 
-s6 = sievefrom2to(MAX_NUM).reshape((-1, 100))  # 2 row * 100 col
-indices = np.argwhere(s6)  # ary of [i,j] nonzero indices
-unrolled_indices = indices
-
-#                                         1st digit
-#                                 1 where switch
-#                     indices where switch
-#             diff in indices
-
 if __name__ == '__main__':
-    print('\n'.join(sparse_centuries_primes(P, 100)))
-    print()
+    # print('\n'.join(sparse_centuries_primes(P, 100)))
+    # print()
 
     ppc = primes_per_century(P)
     simple_diff = np.diff(np.nonzero(np.diff(P // 100)))
+    #                                         1st digit
+    #                                 1 where switch
+    #                     indices where switch
+    #             diff in indices
+
     exp_reduce = np.add.reduceat(EXPECTED, [0,3, 4,7])[::2]
     ppc_reduce = np.add.reduceat(ppc, [0,3, 4,7])[::2]
     sd_reduce = np.add.reduceat(simple_diff[0], [0,3, 4,7])
@@ -86,11 +82,6 @@ if __name__ == '__main__':
     print("first way")
     print(ppc)
     print(ppc_reduce)
-    print()
-
-    print("second way (300)")
-    print(np.sum(np.equal(indices[:, 0], 0)), "from 0 .. 300?")
-    print(np.sum(np.equal(indices[:, 0], 1)), "from 301 .. 600?")
     print()
 
     print("third way (diff)")
