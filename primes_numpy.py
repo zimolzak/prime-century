@@ -2,16 +2,14 @@
 https://oeis.org/A038822
 Number of primes between 100n and 100n+99.
 Look at the scatterplot graph. < 5 primes in a 100 digit range is pretty special.
-The first w/ 0 primes occurs at 16718 (1671800  .. 1671899).
-
-FIXME - some kind of bug where it skips primefree centuries rather than counting them.
+Exepect the first primefree century occurs at 16718 (1671800  .. 1671899).
 """
 
 import numpy as np
 
 EXPECTED = np.array([25, 21, 16, 16, 17, 14, 16, 14, 15, 14, 16, 12, 15, 11, 17, 12, 15, 12, 12, 13, 14, 10])
 
-MAX_NUM = 3 * 10 ** 6  # 100 * len(EXPECTED)
+MAX_NUM = 10 ** 7  # 100 * len(EXPECTED)
 
 
 def sievefrom2to(n):
@@ -45,14 +43,7 @@ def sparse_centuries_primes(p, max_primes=1):
 
 
 def primes_per_century_vec(p):
-    idx_new_century = np.hstack((-1,
-                                np.nonzero(np.diff(p // 100))[0],
-                                #                  hundreds place
-                                #          =1 where it switches to new century
-                                # indices where it switches
-                                 len(p) - 1))
-
-    return np.diff(idx_new_century)
+    return np.bincount(p // 100)
 
 
 if __name__ == '__main__':
