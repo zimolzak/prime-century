@@ -26,15 +26,18 @@ P = primesfrom2to(MAX_NUM)
 
 
 def sparse_centuries_primes(p):
-    list_of_tuples = []
+    list_of_str = []
     for century in tqdm(range(MAX_NUM // 100)):
         lower = century * 100
         upper = lower + 99
         indices = np.greater(p, lower) * np.less(p, upper)
         count = len(p[indices])
         if count < 2:
-            list_of_tuples.append("%i %i %i %i" % (century, lower, upper, count))
-    return list_of_tuples
+            list_of_str.append("%i %i %i %i" % (century, lower, upper, count))
+    return list_of_str
 
 
-print('\n'.join(sparse_centuries_primes(P)))
+if __name__ == '__main__':
+    # print('\n'.join(sparse_centuries_primes(P)))
+    for i, x in enumerate(sievefrom2to(30)):
+        print(i, i + 1, i + 2, i + 3, i + 4, x)
