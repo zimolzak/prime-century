@@ -7,11 +7,11 @@ The first w/ 0 primes occurs at 16718 (1671800  .. 1671899).
 
 import numpy as np
 from tqdm import tqdm
+from timeit import default_timer as timer
 
 EXPECTED = np.array([25, 21, 16, 16, 17, 14, 16, 14, 15, 14, 16, 12, 15, 11, 17, 12, 15, 12, 12, 13, 14, 10])
 
-#  MAX_NUM = 3 * 10 ** 6
-MAX_NUM = 10 ** 6  # 100 * len(EXPECTED)
+MAX_NUM = 3 * 10 ** 6  # 100 * len(EXPECTED)
 
 
 def sievefrom2to(n):
@@ -32,13 +32,10 @@ def primesfrom2to(n):
     return np.r_[2, 3, ((3 * np.nonzero(sieve)[0] + 1) | 1)]
 
 
-P = primesfrom2to(MAX_NUM)
-
-
 def sparse_centuries_primes(p, max_primes=1):
     """Basically a printing function, very little math."""
     list_of_str = []
-    count_list = primes_per_century(p)
+    count_list = primes_per_century_loop(p)
     for century, count in enumerate(count_list):
         lower = century * 100
         upper = lower + 99
@@ -47,7 +44,7 @@ def sparse_centuries_primes(p, max_primes=1):
     return list_of_str
 
 
-def primes_per_century(p):
+def primes_per_century_loop(p):
     """Does this in a silly way with loop."""
     list_of_counts = []
     for century in tqdm(range(MAX_NUM // 100)):
@@ -58,26 +55,40 @@ def primes_per_century(p):
     return list_of_counts
 
 
-if __name__ == '__main__':
-    # print('\n'.join(sparse_centuries_primes(P, 100)))
-    # print()
-
-    ppc = primes_per_century(P)
+def primes_per_century_vec(p):
     idx_new_century = np.hstack((-1,
-                                np.nonzero(np.diff(P // 100))[0],
+                                np.nonzero(np.diff(p // 100))[0],
                                 #                  hundreds place
                                 #          =1 where it switches to new century
                                 # indices where it switches
-                                 len(P) - 1))
-    simple_diff = np.diff(idx_new_century)
+                                 len(p) - 1))
+
+    return np.diff(idx_new_century)
+
+
+if __name__ == '__main__':
+    # print('\n'.join(sparse_centuries_primes(P, 100)))
+    # print()
+    s = timer()
+    P = primesfrom2to(MAX_NUM)
+    e = timer()
+    print(e - s)
 
     print("Expected")
     print(EXPECTED)
     print()
 
     print("first way")
+    s = timer()
+    ppc = primes_per_century_loop(P)
+    e = timer()
+    print(e-s)
     print(np.array(ppc))
     print()
 
     print("third way (diff)")
+    s = timer()
+    simple_diff = primes_per_century_vec(P)
+    e = timer()
+    print(e-s)
     print(simple_diff)
