@@ -8,6 +8,8 @@ The first w/ 0 primes occurs at 16718 (1671800  .. 1671899).
 import numpy as np
 from tqdm import tqdm
 
+EXPECTED = [25, 21, 16, 16, 17, 14, 16, 14, 15, 14, 16, 12]
+
 #  MAX_NUM = 3 * 10 ** 6
 n_rows = 4
 n_sieve_elements = 100 * n_rows
@@ -36,22 +38,31 @@ P = primesfrom2to(MAX_NUM)
 
 
 def sparse_centuries_primes(p, max_primes=1):
+    """Basically a printing function, very little math."""
     list_of_str = []
+    count_list = primes_per_century(p)
+    for century, count in enumerate(count_list):
+        lower = century * 100
+        upper = lower + 99
+        if count <= max_primes:
+            list_of_str.append("%i %i %i %s" % (century, lower, upper, count))
+    return list_of_str
+
+
+def primes_per_century(p):
+    list_of_counts = []
     for century in tqdm(range(MAX_NUM // 100)):
         lower = century * 100
         upper = lower + 99
-        indices = np.greater(p, lower) * np.less(p, upper)
-        count = len(p[indices])
-        if count <= max_primes:
-            list_of_str.append("%i %i %i %i" % (century, lower, upper, count))
-    return list_of_str
+        count = np.sum(np.greater(p, lower) * np.less(p, upper))
+        list_of_counts.append(count)
+    return list_of_counts
 
 
 s6 = sievefrom2to(MAX_NUM).reshape((-1, 100))  # 2 row * 100 col
 indices = np.argwhere(s6)  # ary of [i,j] nonzero indices
 unrolled_indices = indices
 
-simple_diff = np.diff(np.nonzero(np.diff(P // 100)))
 #                                         1st digit
 #                                 1 where switch
 #                     indices where switch
@@ -59,6 +70,29 @@ simple_diff = np.diff(np.nonzero(np.diff(P // 100)))
 
 if __name__ == '__main__':
     print('\n'.join(sparse_centuries_primes(P, 100)))
+    print()
+
+    ppc = primes_per_century(P)
+    simple_diff = np.diff(np.nonzero(np.diff(P // 100)))
+    exp_reduce = np.add.reduceat(EXPECTED, [0,3, 4,7])[::2]
+    ppc_reduce = np.add.reduceat(ppc, [0,3, 4,7])[::2]
+    sd_reduce = np.add.reduceat(simple_diff[0], [0,3, 4,7])
+
+    print("Expected")
+    print(EXPECTED)
+    print(exp_reduce)
+    print()
+
+    print("first way")
+    print(ppc)
+    print(ppc_reduce)
+    print()
+
+    print("second way (300)")
     print(np.sum(np.equal(indices[:, 0], 0)), "from 0 .. 300?")
     print(np.sum(np.equal(indices[:, 0], 1)), "from 301 .. 600?")
+    print()
+
+    print("third way (diff)")
     print(simple_diff)
+    print(sd_reduce)
